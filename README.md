@@ -1,51 +1,103 @@
 ```mermaid
 classDiagram
-    class Usuario {
-        +String id
-        +String nome
-        +String email
-        +String senha
-        +String cpf
-        +String rg
+    %% Componentes React
+    class App {
+        - user
+        - userId
+        - currentPage
+        + handleLogout()
+        + addGame()
+        + setPage
     }
 
-    class Cliente {
-        +String id
-        +String nome
-        +String cpf
-        +String rg
-        +String telefone
+    class LandingPage
+
+    class Auth {
+        + handleLogin()
+        + handleSignup()
     }
 
-    class Financeiro {
-        +String id
-        +double saldo
-        +void registrarDespesa(double valor, String descricao)
-        +void registrarReceita(double valor, String descricao)
+    class Dashboard {
+        - selectedGameId
+        + updateGameStatus()
+        + uploadImage()
     }
 
-    class Despesa {
-        +String id
-        +double valor
-        +String descricao
-        +Date data
+    class GameDetail {
+        - gameId
+        + completeAchievement()
+        + updateGameProgress()
     }
 
-    class Receita {
-        +String id
-        +double valor
-        +String descricao
-        +Date data
+    class UserSearch {
+        - selectedUserIdToDisplay
+        + performSearch()
     }
 
-    class Horario {
-        +String id
-        +Date data
-        +String descricao
-        +double horasTrabalhadas
+    class PublicProfile {
+        - userId
+        + displayGames()
     }
 
-    Usuario --> Cliente : pode cadastrar
-    Cliente "1" --> "0..*" Horario : tem registros de horário
-    Financeiro "1" --> "0..*" Despesa : tem despesas
-    Financeiro "1" --> "0..*" Receita : tem receitas
+    class ImageGallery
+
+    %% Firebase Services
+    class FirebaseApp
+    class FirestoreDB
+    class FirebaseAuth
+    class FirebaseStorage
+
+    %% Data Models
+    class Jogo {
+        id
+        title
+        platform
+        status
+        imageUrl
+    }
+
+    class Conquista {
+        id
+        description
+        completed
+    }
+
+    class JogoPublico {
+        gameId
+        ownerId
+        title
+        platform
+        status
+        imageUrl
+    }
+
+    %% Relações
+    App --> LandingPage : renderiza
+    App --> Auth : renderiza
+    App --> Dashboard : renderiza
+    App --> UserSearch : renderiza
+    App --> PublicProfile : renderiza
+    App --> ImageGallery : renderiza
+
+    Auth ..> FirebaseAuth : usa
+
+    Dashboard ..> FirestoreDB : lê/escreve jogos
+    Dashboard ..> FirebaseStorage : upload imagens
+    Dashboard --> GameDetail : passa selectedGameId
+
+    GameDetail ..> FirestoreDB : lê/escreve conquistas
+    GameDetail ..> FirebaseStorage : obtém imagem
+
+    UserSearch ..> FirestoreDB : busca public_games
+    UserSearch --> PublicProfile : passa selectedUserIdToDisplay
+
+    PublicProfile ..> FirestoreDB : lê public_games
+
+    %% Fluxos de dados
+    Dashboard --> Jogo : manipula
+    GameDetail --> Conquista : manipula
+    PublicProfile --> JogoPublico : manipula
+
+    %% Firebase App
+    App ..> FirebaseApp : inicializa
+
